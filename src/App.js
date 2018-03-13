@@ -7,12 +7,10 @@ class App extends Component {
   state = { messages: [], selected: [], isFormShown: false };
 
   componentDidMount = async () => {
-    const response = await fetch('http://localhost:8082/api/messages');
-    const json = await response.json();
-    this.setState({ messages: json._embedded.messages });
+    let messagesState = await this.fetchData();
+    this.setState({ messages: messagesState });
   };
   updateStarredMessage = async (id, method, value) => {
-    let newMessageList = [...this.state.messages];
     let body = {
       messageIds: [id],
       command: method,
@@ -25,13 +23,10 @@ class App extends Component {
         'Accept': 'application/json',
       }
     });
-    newMessageList.forEach(msg => {
-      if(msg.id === id) msg.starred = !value;
-    });
-    this.setState({ messages: newMessageList });
+    let messagesState = await this.fetchData();
+    this.setState({ messages: messagesState });
   };
   updateMessageList = async (method, value) => {
-    let newMessageList = [...this.state.messages];
     let property;
     let body = {
       messageIds: this.state.selected,
@@ -57,24 +52,8 @@ class App extends Component {
         'Accept': 'application/json',
       }
     });
-    for (let i = 0; i < newMessageList.length; i++) {
-      let msg = newMessageList[i];
-      if (this.state.selected.includes(msg.id)) {
-        if (property === 'label') {
-          if (msg.labels.includes(value) ){
-            if (method === 'removeLabel') msg.labels.splice(msg.labels.indexOf(value), 1);
-          } else {
-            if (method === 'addLabel') msg.labels.push(value);
-          }
-        } else if (property === 'read') {
-          msg[property] = value;
-        } else {
-          newMessageList.splice(newMessageList.indexOf(msg), 1);
-          i--;
-        }
-      }
-    }
-    this.setState({ messages: newMessageList });
+    let messagesState = await this.fetchData();
+    this.setState({ messages: messagesState });
   };
   updateSelectedList = (array, all) => {
     let newSelected = [...this.state.selected];
@@ -105,9 +84,14 @@ class App extends Component {
         'Accept': 'application/json',
       }
     });
-    let json = await res.json();
-    this.componentDidMount();
+    let messagesState = await this.fetchData();
+    this.setState({ messages: messagesState });
   };
+  fetchData = async () => {
+    const response = await fetch('http://localhost:8082/api/messages');
+    const json = await response.json();
+    return json._embedded.messages;
+  }
   render() {
     return (
       <div className="container">
