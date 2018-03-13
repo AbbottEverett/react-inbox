@@ -1,4 +1,5 @@
 import React from 'react';
+import Form from './Form';
 
 const Toolbar = (props) => {
 
@@ -13,112 +14,81 @@ const Toolbar = (props) => {
   }
   const updateSelectedList = (e) => {
     let checkboxState = e.target.classList.value;
-    if (checkboxState === 'fa fa-check-square-o') {
-      props.messages.forEach((msg, i) => {
-        if (msg.isSelected) {
-          msg.isSelected = false;
-        }
-        props.updateMessageList(msg, i);
-      });
-    } else {
-      props.messages.forEach((msg, i) => {
-        if (!msg.isSelected) {
-          msg.isSelected = true;
-        }
-        props.updateMessageList(msg, i);
+    let idList = [];
+    if (checkboxState !== 'fa fa-check-square-o') {
+      idList = props.messages.map((msg) => {
+        return msg.id;
       });
     }
+    props.updateSelectedList(idList, true);
   }
   const markAsRead = () => {
-    props.messages.forEach((msg, i) => {
-      if (msg.isSelected) {
-        msg.isRead = true;
-      }
-      props.updateMessageList(msg, i);
-    });
+    props.updateMessageList('read', true);
   }
   const markAsUnread = () => {
-    props.messages.forEach((msg, i) => {
-      if (msg.isSelected) {
-        msg.isRead = false;
-      }
-      props.updateMessageList(msg, i);
-    });
-  }
-  const deleteSelected = () => {
-    let messageList = props.messages;
-    for (let i = 0; i < messageList.length; i++) {
-      let msg = messageList[i];
-      if (msg.isSelected) {
-        msg.deleted = true;
-        props.updateMessageList(msg, i);
-        messageList.splice(i, 1);
-        i--;
-      }
-    }
+    props.updateMessageList('read', false);
   }
   const addLabel = (e) => {
     let label = e.target.value;
-    props.messages.forEach((msg, i) => {
-      if (msg.isSelected) {
-        if (!msg.labels.includes(label)) {
-          msg.labels.push(label);
-        }
-      }
-      props.updateMessageList(msg, i);
-    });
+    props.updateMessageList('addLabel', label);
   }
   const removeLabel = (e) => {
     let label = e.target.value;
-    props.messages.forEach((msg, i) => {
-      if (msg.isSelected) {
-        let index = msg.labels.indexOf(label);
-        if (index > -1) {
-          msg.labels.splice(index, 1);
-        }
-      }
-      props.updateMessageList(msg, i);
-    });
+    props.updateMessageList('removeLabel', label);
   }
-  const unread = props.messages.filter(message => !message.isRead);
-  const selected = props.messages.filter(message => message.isSelected);
+  const deleteSelected = () => {
+    props.updateMessageList('delete');
+  }
+
+  const unread = props.messages.filter(message => !message.read);
+  const selected = props.messages.filter((message) => {
+    return props.selected.includes(message.id);
+  });
   return (
-    <div className="row toolbar">
-      <div className="col-md-12">
-        <p className="pull-right">
-          <span className="badge badge">{unread.length}</span>
-          unread messages
-        </p>
+    <div>
+      <div className="row toolbar">
+        <div className="col-md-12">
+          <p className="pull-right">
+            <span className="badge badge">{unread.length}</span>
+            unread messages
+          </p>
+          <a onClick={props.toggleForm} className="btn btn-danger">
+            <i className="fa fa-plus"></i>
+          </a>
 
-        <button onClick={updateSelectedList} className="btn btn-default">
-          <i className={toggleIcon(selected)}></i>
-        </button>
+          <button onClick={updateSelectedList} className="btn btn-default">
+            <i className={toggleIcon(selected)}></i>
+          </button>
 
-        <button disabled={selected.length < 1} onClick={markAsRead} className="btn btn-default">
-          Mark As Read
-        </button>
+          <button disabled={selected.length < 1} onClick={markAsRead} className="btn btn-default">
+            Mark As Read
+          </button>
 
-        <button disabled={selected.length < 1} onClick={markAsUnread} className="btn btn-default">
-          Mark As Unread
-        </button>
+          <button disabled={selected.length < 1} onClick={markAsUnread} className="btn btn-default">
+            Mark As Unread
+          </button>
 
-        <select disabled={selected.length < 1} onChange={addLabel} className="form-control label-select">
-          <option>Apply label</option>
-          <option value="dev">dev</option>
-          <option value="personal">personal</option>
-          <option value="gschool">gschool</option>
-        </select>
+          <select disabled={selected.length < 1} onChange={addLabel} className="form-control label-select">
+            <option>Apply label</option>
+            <option value="dev">dev</option>
+            <option value="personal">personal</option>
+            <option value="gschool">gschool</option>
+          </select>
 
-        <select disabled={selected.length < 1} onChange={removeLabel} className="form-control label-select">
-          <option>Remove label</option>
-          <option value="dev">dev</option>
-          <option value="personal">personal</option>
-          <option value="gschool">gschool</option>
-        </select>
+          <select disabled={selected.length < 1} onChange={removeLabel} className="form-control label-select">
+            <option>Remove label</option>
+            <option value="dev">dev</option>
+            <option value="personal">personal</option>
+            <option value="gschool">gschool</option>
+          </select>
 
-        <button disabled={selected.length < 1} onClick={deleteSelected} className="btn btn-default">
-          <i className="fa fa-trash-o"></i>
-        </button>
+          <button disabled={selected.length < 1} onClick={deleteSelected} className="btn btn-default">
+            <i className="fa fa-trash-o"></i>
+          </button>
+        </div>
+      </div>
+      <div className="row">
+        {props.isFormShown ? <Form postMessage={props.postMessage} toggleForm={props.toggleForm} /> : ""}
       </div>
     </div>
   );

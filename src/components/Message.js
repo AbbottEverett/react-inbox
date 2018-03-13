@@ -3,35 +3,31 @@ import React from 'react';
 const Message = (props) => {
 
   const toggleSelected = () => {
-    let newState = {...props};
-    newState.isSelected = !newState.isSelected;
-    props.updateMessageList(newState, newState.value);
+    props.updateSelectedList([props.value]);
   }
 
   const toggleStarred = () => {
-    let newState = {...props};
-    newState.isStarred = !newState.isStarred;
-    props.updateMessageList(newState, newState.value);
+    props.updateStarredMessage(props.value, 'star', props.starred);
   }
 
 
-  let {isRead, isSelected, isStarred, labels, messageText} = props;
+  let {read, selected, starred, labels, subject} = props;
   return (
-    <div className={"row message " + (isRead ? "read " : "unread ") + (isSelected ? "selected" : "")}>
+    <div className={"row message " + (read ? "read " : "unread ") + (selected ? "selected" : "")}>
       <div className="col-xs-1">
         <div className="row">
           <div className="col-xs-2">
-            <input onChange={toggleSelected} type="checkbox" checked={isSelected ? "checked" : ""}/>
+            <input onChange={toggleSelected} type="checkbox" checked={selected ? "checked" : ""}/>
           </div>
           <div className="col-xs-2">
-            <i onClick={toggleStarred} className={"star fa " + (isStarred ? "fa-star" : "fa-star-o")}></i>
+            <i onClick={toggleStarred} className={"star fa " + (starred ? "fa-star" : "fa-star-o")}></i>
           </div>
         </div>
       </div>
       <div className="col-xs-11">
-        {labels.map(label => <span className="label label-warning">{label}</span>)}
+        {labels.map((label, i)=> <span key={`Label${i}`} className="label label-warning">{label}</span>)}
         <a href="#">
-          {messageText}
+          {subject}
         </a>
       </div>
     </div>

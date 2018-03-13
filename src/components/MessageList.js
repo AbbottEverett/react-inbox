@@ -5,7 +5,9 @@ const MessageList = (props) => {
   return (
     <div>
       {props.messages.map((message, i) => {
-        return <Message key={i} value={i} updateMessageList={props.updateMessageList} isRead={message.isRead} isSelected={message.isSelected} isStarred={message.isStarred} labels={message.labels} messageText={message.messageText}/>
+        let isSelected = false;
+        if (props.selected.includes(message.id)) isSelected = true;
+        return <Message key={`Message${i}`} value={message.id} updateSelectedList={props.updateSelectedList} updateStarredMessage={props.updateStarredMessage} read={message.read} selected={isSelected} starred={message.starred} labels={message.labels} subject={message.subject}/>
       })}
     </div>
   );
