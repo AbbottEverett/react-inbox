@@ -1,26 +1,27 @@
 import React from 'react';
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { toggleSelected, starMessage, toggleLabel } from '../actions'
 
-const Message = (props) => {
-
-  const toggleSelected = () => {
-    props.updateSelectedList([props.value]);
-  }
-
-  const toggleStarred = () => {
-    props.updateStarredMessage(props.value, 'star', props.starred);
-  }
-
-
-  let {read, selected, starred, labels, subject} = props;
+const Message = ({
+  toggleSelected,
+  starMessage,
+  message,
+  read,
+  labels,
+  starred,
+  isSelected
+}) => {
+  let {id, subject} = message;
   return (
-    <div className={"row message " + (read ? "read " : "unread ") + (selected ? "selected" : "")}>
+    <div className={"row message " + (read ? "read " : "unread ") + (isSelected ? "selected" : "")}>
       <div className="col-xs-1">
         <div className="row">
           <div className="col-xs-2">
-            <input onChange={toggleSelected} type="checkbox" checked={selected ? "checked" : ""}/>
+            <input onChange={() => toggleSelected(id)} type="checkbox" checked={isSelected ? "checked" : ""}/>
           </div>
           <div className="col-xs-2">
-            <i onClick={toggleStarred} className={"star fa " + (starred ? "fa-star" : "fa-star-o")}></i>
+            <i onClick={() => starMessage(id, starred)} className={"star fa " + (starred ? "fa-star" : "fa-star-o")}></i>
           </div>
         </div>
       </div>
@@ -35,4 +36,13 @@ const Message = (props) => {
 
 }
 
-export default Message;
+const mapStateToProps = () => ({});
+
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  toggleSelected, starMessage, toggleLabel
+}, dispatch);
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Message);

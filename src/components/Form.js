@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { toggleForm, createMessage, fetchMessages } from '../actions'
 
-export default class Form extends Component {
+class Form extends Component {
   state = { subject: '', body: '' };
 
   setSubject = (e) => {
@@ -14,8 +17,8 @@ export default class Form extends Component {
   composeMessage = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    this.props.toggleForm();
-    this.props.postMessage(this.state);
+    this.props.createMessage(this.state);
+    this.props.toggleForm()
   }
 
   render() {
@@ -48,3 +51,14 @@ export default class Form extends Component {
     );
   }
 }
+
+const mapStateToProps = () => ({});
+
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  createMessage, toggleForm, fetchMessages
+}, dispatch);
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Form);
